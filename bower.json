@@ -1,6 +1,6 @@
 {
-  "name": "paper-datatable",
-  "version": "1.0.0",
+  "name": "polymer-paper-datatable",
+  "version": "1.1.0",
   "authors": [
     "David Mulder <david.mulder@ymail.com>"
   ],
@@ -38,8 +38,5 @@
     "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#^1.2.1",
     "paper-input": "PolymerElements/paper-input#^1.1.11",
     "paper-card": "PolymerElements/paper-card#^1.1.1"
-  },
-  "resolutions": {
-    "polymer": "^1.5.0"
   }
 }
