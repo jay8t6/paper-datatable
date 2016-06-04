@@ -152,22 +152,6 @@ This element is used inside of `<paper-datatable>` to declare the columns to be 
 						value: 'left'
 					},
 					/**
-					 * Style to be applied to the header.
-					 *
-					 * @attribute style
-					 * @type String
-					 */
-					_styleString: {
-						type: String,
-						value: function(){
-							var alignment = this.align || this.getAttribute('align') || 'left';
-							var minWidth = this.width || this.getAttribute('width') || 0;
-							minWidth += parseFloat(minWidth).toString() === minWidth ? 'px' : '';
-							var styleString = this.getAttribute('style') || '';
-							return 'text-align:'+alignment+';min-width:'+minWidth+';'+styleString;
-						}
-					},
-					/**
 					 * If you have `undefined`'s in your `data` this method can be used to
 					 * set a default, thus preventing auto-saves from triggering.
 					 *

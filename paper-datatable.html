@@ -249,7 +249,7 @@
 							</th>
 						</template>
 						<template id="columnRepeat" is="dom-repeat" items="{{_columns}}" as="column" on-dom-change="_columnsRendered">
-							<th class="column" data-sortable$="[[column.sortable]]" data-column="[[column]]" on-tap="_handleSort" style$="{{column._styleString}}">
+							<th class="column" data-sortable$="[[column.sortable]]" data-column="[[column]]" on-tap="_handleSort" style$="{{_styleString(column)}}">
 								<iron-icon icon="datatable:sort-desc-md" class="sort"></iron-icon>
 								<span id="title">{{column.header}}</span>
 								<template is="dom-if" if="[[column.tooltip]]">
@@ -542,6 +542,18 @@ A [material design implementation of a data table](https://www.google.com/design
 					this.set("_rowKeys", rowKeys);
 					//why again was this necessary?
 					this._internalSort(this.get('_currentlySortedColumn'));
+				},
+
+
+				/**
+				 * alignment and width to be applied to the header.
+				 *
+				 */
+				_styleString: function(){
+					var alignment = this.align || 'left';
+					var minWidth = this.width || 0;
+					minWidth += parseFloat(minWidth).toString() === minWidth ? 'px' : '';
+					return 'text-align:'+alignment+';min-width:'+minWidth+';';
 				},
 
 				/**

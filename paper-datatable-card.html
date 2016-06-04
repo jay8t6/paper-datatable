@@ -427,6 +427,7 @@
 							}.bind(this));
 
 						}else{
+							if (this.dataSource.length === 0) return;
 							this.dataSource.get.apply(this.dataSource, queryArgs).then(function(items){
 								processItems(items);
 							});
