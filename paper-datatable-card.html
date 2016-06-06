@@ -5,6 +5,7 @@
 <link rel="import" href="../paper-material/paper-material.html">
 <link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../paper-menu/paper-menu.html">
+<link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="../paper-item/paper-item.html">
 <link rel="import" href="../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../paper-progress/paper-progress.html">
@@ -81,6 +82,7 @@
 			}
 			#bottomBlock paper-dropdown-menu{
 				vertical-align: middle;
+				margin-right: 18px;
 				--paper-input-container-underline: {
 					display: none;
 				};
@@ -93,7 +95,18 @@
 				--paper-dropdown-menu-icon: {
 					color: var(--paper-datatable-navigation-bar-text-color, rgba(0,0,0,.54));
 				};
-				margin-right: 18px;
+			}
+			#bottomBlock .page-count {
+				padding: 0 20px 0 0;
+				@apply(--paper-datatable-card-page-count);
+			}
+			#bottomBlock .pagination-container {
+				padding: 0 20px 0 0;
+				@apply(--paper-datatable-card-pagination-container);
+			}
+			#bottomBlock .pagination-container paper-button {
+				min-width: 30px;
+				@apply(--paper-datatable-card-pagination);
 			}
 		</style>
 		<paper-material elevation="1">
@@ -132,11 +145,23 @@
 						</template>
 					</paper-menu>
 				</paper-dropdown-menu>
-				<span>
+				<span class="page-count">
 					<span>[[_getRangeStart(page, pageSize)]]</span>-<span>[[_getRangeEnd(page, pageSize, numberOfItems)]]</span> of&nbsp;<span>[[numberOfItems]]</span>
 				</span>
 				<paper-icon-button icon="datatable:first-page" on-tap="firstPage" disabled="[[_prevPageDisabled(page)]]"></paper-icon-button>
 				<paper-icon-button icon="datatable:prev-page" on-tap="prevPage" disabled="[[_prevPageDisabled(page)]]"></paper-icon-button>
+				<span class="pagination-container">
+					<template id="pagination" is="dom-repeat" items="{{_getPaginationButtons(page, pageSize, numberOfItems)}}">
+						<template is="dom-if" if="{{_isCurrentPage(item, page)}}">
+							<paper-button disabled>{{item}}</paper-button>
+						</template>
+						<template is="dom-if" if="{{!_isCurrentPage(item, page)}}">
+							<a on-click="gotoPage" tabindex="-1">
+								<paper-button raised>{{item}}</paper-button>
+							</a>
+						</template>
+					</template>
+				</span>
 				<paper-icon-button icon="datatable:next-page" on-tap="nextPage" disabled="[[_nextPageDisabled(page, pageSize, numberOfItems)]]"></paper-icon-button>
 				<paper-icon-button icon="datatable:last-page" on-tap="lastPage" disabled="[[_nextPageDisabled(page, pageSize, numberOfItems)]]"></paper-icon-button>
 			</div>
@@ -174,7 +199,10 @@
 					 * @attribute dataSource
 					 * @type Object
 					 */
-					dataSource: Object,
+					dataSource: {
+						type: Object,
+						notify: true
+					},
 					/**
 					 * Number of items per page
 					 *
@@ -280,7 +308,6 @@
 				},
 				observers: [
 					'retrieveVisibleData(dataSource, pageSize, page, _datatable, _sortDirection, _sortProperty)',
-					'_setNumberOfItems(dataSource.length)',
 					'_createCache(dataSource.queryForIds)'
 				],
 				_createCache: function(){
@@ -367,6 +394,7 @@
 
 							var args = ['data'].concat(items);
 							this._datatable.push.apply(this._datatable,args);
+							this._setNumberOfItems();
 							this._setSelectedKeysOnDatatable();
 							this._datatable.set('progress', false);
 
@@ -442,10 +470,55 @@
 					return Math.min((this.page)*this.pageSize, this.numberOfItems);
 				},
 				/**
+				 * Populate pagination
+				 */
+				_getPaginationButtons: function() {
+					var pagination = [];
+					var totalPages = Math.ceil(this.dataSource.length / this.pageSize);
+					var maxPage, maxPivotPages, minPage, pages, maxBlocks;
+					var paginationMaxBlocks = 11;
+					var paginationMinBlocks = 5;
+          maxBlocks = maxBlocks && maxBlocks < 6 ? 6 : maxBlocks;
+					if (totalPages > 1) {
+						maxPivotPages = Math.round((paginationMaxBlocks - paginationMinBlocks) / 2);
+	          minPage = Math.max(2, this.page - maxPivotPages);
+	          maxPage = Math.min(totalPages - 1, this.page + maxPivotPages * 2 - (this.page - minPage));
+	          minPage = Math.max(2, minPage - (maxPivotPages * 2 - (maxPage - minPage)));
+						var i = minPage;
+						pagination.push(1);
+	          while (i <= maxPage) {
+	            if ((i === minPage && i !== 2) || (i === maxPage && i !== totalPages - 1)) {
+	                pagination.push('...');
+	            } else {
+	                pagination.push(i);
+	            }
+	            i++;
+	          }
+						pagination.push(totalPages);
+					}
+					return pagination;
+				},
+				/**
+				 * Return if the pagination button is the selected
+				 */
+			 	_isCurrentPage: function(item, page) {
+				 	return page === item;
+			 	},
+				/**
 				 * Navigate to the next page
 				 */
 				nextPage: function(){
 					this.set("page", this.page+1);
+				},
+				/**
+				 * Navigate to page
+				 */
+				gotoPage: function(event){
+					var pageNum = event.model.item;
+					if (pageNum !== '...') {
+						this.set("page", pageNum);
+					}
+					//this.$.pagination.render();
 				},
 				/**
 				 * Navigate to the previous page
@@ -507,7 +580,7 @@
 						}
 					}.bind(this));
 				},
-				_setNumberOfItems: function(){
+				_setNumberOfItems: function() {
 					this.set('numberOfItems', this.dataSource.length);
 				},
 				_toggleAll: function(ev){
