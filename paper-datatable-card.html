@@ -308,7 +308,8 @@
 				},
 				observers: [
 					'retrieveVisibleData(dataSource, pageSize, page, _datatable, _sortDirection, _sortProperty)',
-					'_createCache(dataSource.queryForIds)'
+					'_createCache(dataSource.queryForIds)',
+					'_getSelectedPageSize(pageSize)'
 				],
 				_createCache: function(){
 					this._cacheUsed = true;
@@ -468,6 +469,12 @@
 				},
 				_getRangeEnd: function(){
 					return Math.min((this.page)*this.pageSize, this.numberOfItems);
+				},
+				/**
+				 * Reset the page number when page size is updated
+				 */
+				_getSelectedPageSize: function(event) {
+					this.set("page", 1);
 				},
 				/**
 				 * Populate pagination
