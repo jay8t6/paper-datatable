@@ -313,6 +313,17 @@
 						</template>
 					</template>
 				</tbody>
+				<template is="dom-if" if="{{hasFooter}}">
+					<tfoot>
+						<tr>
+							<template id="columnRepeat" is="dom-repeat" items="{{_columns}}" as="column" on-dom-change="_columnsRendered">
+								<td class="column" data-column="[[column]]" style$="{{_styleString(column)}}">
+									<span id="title">{{column.footer}}</span>
+								</td>
+							</template>
+						</tr>
+					</tfoot>
+				</template>
 			</table>
 		</div>
 	</template>
@@ -367,6 +378,17 @@ A [material design implementation of a data table](https://www.google.com/design
 					 */
 					selectable: {
 						type: Boolean
+					},
+					/**
+					 * Whether to show footer.
+					 *
+					 * @attribute hasFooter
+					 * @type Boolean
+					 * @default false
+					 */
+					hasFooter: {
+						type: Boolean,
+						value: false
 					},
 					/**
 					 * Whether to allow selection of more than one row.
@@ -544,18 +566,6 @@ A [material design implementation of a data table](https://www.google.com/design
 					this._internalSort(this.get('_currentlySortedColumn'));
 				},
 
-
-				/**
-				 * alignment and width to be applied to the header.
-				 *
-				 */
-				_styleString: function(){
-					var alignment = this.align || 'left';
-					var minWidth = this.width || 0;
-					minWidth += parseFloat(minWidth).toString() === minWidth ? 'px' : '';
-					return 'text-align:'+alignment+';min-width:'+minWidth+';';
-				},
-
 				/**
 				 * If you have been changing data on the `data` property outside of the official Polymer functions
 				 * calling this function *may* get you the updates you want.
@@ -699,6 +709,19 @@ A [material design implementation of a data table](https://www.google.com/design
 
 						}
 					}
+				},
+
+				/**
+				 * Style to be applied to the header.
+				 *
+				 * @attribute style
+				 * @type String
+				 */
+				_styleString: function(column) {
+					var alignment = column.align || 'left';
+					var minWidth = column.width || 0;
+					minWidth += parseFloat(minWidth).toString() === minWidth ? 'px' : '';
+					return 'text-align:'+alignment+';min-width:'+minWidth+';';
 				},
 
 				/**
