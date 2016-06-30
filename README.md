@@ -1,4 +1,3 @@
-# ***WARNING*** This is a temporary project. Do not use.
 # paper-datatable
 
 A [material design implementation of a data table](https://www.google.com/design/spec/components/data-tables.html). Let's call this a pretty solid beta.
