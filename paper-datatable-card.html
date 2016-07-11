@@ -11,7 +11,7 @@
 <link rel="import" href="../paper-progress/paper-progress.html">
 <link rel="import" href="../paper-styles/paper-styles.html">
 
-
+<script src="../file-saver/FileSaver.min.js"></script>
 <script src="weakCache.js"></script>
 <dom-module id="paper-datatable-card">
 	<template>
@@ -69,6 +69,15 @@
 				font-size:16px;
 				@apply(--paper-font-common-base);
 			}
+			#topBlock .dg-desc {
+				@apply(--paper-datatable-card-download-desc);
+			}
+			#topBlock .dg-buttons {
+				@apply(--paper-datatable-card-download-button-group);
+			}
+			#topBlock .dg-button {
+				@apply(--paper-datatable-card-download-button);
+			}
 			#bottomBlock{
 				height:56px;
 				padding:0px 6px;
@@ -117,6 +126,21 @@
 				<div id="toolbar-main" class="toolbar">
 					<content select="*[toolbar-main]"></content>
 				</div>
+				<template is="dom-if" if="{{_hasDownload(csvData, pdfData)}}">
+					<div class="dg-desc">Export as:</div>
+			    <div class="dg-buttons">
+						<template is="dom-if" if="{{_hasCSVDownload(csvData)}}">
+				      <a class="dg-button buttons-csv" on-tap="download" data-download="csv" href="#">
+				        <span data-download="csv">CSV</span>
+				      </a>
+						</template>
+						<template is="dom-if" if="{{_hasPDFDownload(pdfData)}}">
+				      <a class="dg-button buttons-pdf" data-download="pdf" href="{{pdfData}}" target="_blank">
+				        <span data-download="pdf">PDF</span>
+				      </a>
+						</template>
+			    </div>
+				</template>
 				<div id="selectionToolbar" class="horizontal center layout fit" data-visible$="[[_selectedToolbarVisible]]">
 					<div class="flex selectionHeader">
 						<span>[[_numberselectedIds]]</span> item selected
@@ -239,6 +263,30 @@
 						value: 1,
 						notify: true
 					},
+					/**
+					 * Data for CSV
+					 *
+					 * @attribute csvData
+					 * @default ''
+					 * @type String
+					 */
+					csvData: {
+						type: String,
+						value: '',
+						notify: true
+					},
+					/**
+					 * Data for PDF
+					 *
+					 * @attribute pdfData
+					 * @default ''
+					 * @type String
+					 */
+					pdfData: {
+						type: String,
+						value: '',
+						notify: true
+					},
 					_disableSave: {
 						type: Boolean,
 						value: false
@@ -309,7 +357,10 @@
 				observers: [
 					'retrieveVisibleData(dataSource, pageSize, page, _datatable, _sortDirection, _sortProperty)',
 					'_createCache(dataSource.queryForIds)',
-					'_getSelectedPageSize(pageSize)'
+					'_getSelectedPageSize(pageSize)',
+					'_hasDownload(csvData, pdfData)',
+					'_hasCSVDownload(csvData)',
+					'_hasPDFDownload(pdfData)'
 				],
 				_createCache: function(){
 					this._cacheUsed = true;
@@ -373,7 +424,6 @@
 					if(this.dataSource) {
 						ev.preventDefault();
 						this.firstPage();
-						console.log(ev.detail);
 						this._sortProperty = ev.detail.sort.property;
 						this._sortDirection = ev.detail.sort.direction;
 
@@ -608,6 +658,38 @@
 							ev.preventDefault();
 						}
 					}
+				},
+				/**
+				 * Check if the table has CSV data
+				 */
+				_hasCSVDownload: function() {
+					return this.csvData !== '';
+				},
+				/**
+				 * Check if the table has PDF data
+				 */
+				_hasPDFDownload: function() {
+					return this.pdfData !== '';
+				},
+				/**
+				 * Check if the table has CSV or PDF Data, will be used to show hide Export option
+				 */
+				_hasDownload: function() {
+					return this._hasCSVDownload() || this._hasPDFDownload();
+				},
+				/**
+				 * Download
+				 */
+				download: function(e) {
+					var fileType = e.target.getAttribute('data-download');
+					var contentType = (fileType === 'csv') ? 'text/csv' : 'application/pdf';
+					var data = (fileType === 'csv') ? this.csvData : this.pdfData;
+					var fileName = this.header.replace(/\s+/g, '');
+
+					const blob = new Blob([data], {
+						type: contentType
+					});
+					saveAs(blob, fileName + '.' + fileType);
 				},
 				/**
 				 * Deselect all items
