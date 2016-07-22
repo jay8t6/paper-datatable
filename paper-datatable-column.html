@@ -11,6 +11,17 @@
 				<div class="array-item">{{_pdt_getArrayItemLabel(column, arrayItem)}}</div>
 			</template>
 		</template>
+		<template id="imageTemplate">
+			<iron-image src="{{value}}"></iron-image>
+		</template>
+		<template id="linkTemplate">
+			<template is="dom-if" if="{{_hasLink(value)}}">
+				<a href="#" on-click="_drillDown">{{value.hierarchyName}}</a>
+			</template>
+			<template is="dom-if" if="{{!_hasLink(value)}}">
+				{{value.hierarchyName}}
+			</template>
+		</template>
 		<template id="editableInputTemplate">
 			<paper-input type="[[_pdt_getCorrectTypeForInput(column.type)]]" value="{{value}}" step="any" no-label-float></paper-input>
 		</template>
@@ -261,6 +272,10 @@ This element is used inside of `<paper-datatable>` to declare the columns to be 
 						var template = this.$.editableInputTemplate;
 					}else if(!template && this.editable && this.type.toLowerCase() == 'boolean'){
 						var template = this.$.editableBooleanTemplate;
+					}else if(!template && this.type.toLowerCase() == 'image'){
+						var template = this.$.imageTemplate;
+					}else if(!template && this.type.toLowerCase() == 'link'){
+						var template = this.$.linkTemplate;
 					}
 
 					if(template) {
@@ -415,6 +430,7 @@ This element is used inside of `<paper-datatable>` to declare the columns to be 
 
 					this.dataHost._pdt_getArrayItemLabel = this._getArrayItemLabel;
 					this.dataHost._pdt_getCorrectTypeForInput = this._getCorrectTypeForInput;
+					this.dataHost._hasLink = this._hasLink;
 
 				},
 				_getArrayItemLabel: function(column, value){
@@ -426,9 +442,10 @@ This element is used inside of `<paper-datatable>` to declare the columns to be 
 					}else if(type.toLowerCase() == 'number'){
 						return 'number';
 					}
+				},
+				_hasLink: function(value){
+					return value.nextUrl !== null;
 				}
-
-
 			});
 		})();
 	</script>
