@@ -29,7 +29,8 @@
     "whenever.js": "^0.0.2",
     "iron-form": "PolymerElements/iron-form#^1.0.16",
     "paper-drawer-panel": "PolymerElements/paper-drawer-panel#^1.0.9",
-    "file-saver": "filesaverjs#^1.3.2"
+    "file-saver": "filesaverjs#^1.3.2",
+    "iron-image": "PolymerElements/iron-image#^1.2.3"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.1.6",
