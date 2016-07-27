@@ -15,12 +15,14 @@
 			<iron-image src="{{value}}"></iron-image>
 		</template>
 		<template id="linkTemplate">
-			<template is="dom-if" if="{{_hasLink(value)}}">
-				<a href="#" on-click="_drillDown">{{value.hierarchyName}}</a>
-			</template>
-			<template is="dom-if" if="{{!_hasLink(value)}}">
-				{{value.hierarchyName}}
-			</template>
+			<span>
+				<template is="dom-if" if="{{_hasLink(value)}}">
+					<a href="#" on-click="_drillDown">{{value.hierarchyName}}</a>
+				</template>
+				<template is="dom-if" if="{{!_hasLink(value)}}">
+					{{value.hierarchyName}}
+				</template>
+			</span>
 		</template>
 		<template id="editableInputTemplate">
 			<paper-input type="[[_pdt_getCorrectTypeForInput(column.type)]]" value="{{value}}" step="any" no-label-float></paper-input>
