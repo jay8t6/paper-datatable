@@ -351,6 +351,7 @@
 					this._datatable.addEventListener("selection-changed", this._setSelectedIds.bind(this));
 					this._datatable.addEventListener("selection-changed", this._setSelectedToolbarVisible.bind(this));
 					this._datatable.addEventListener("toggle-all", this._toggleAll.bind(this));
+					this._datatable.set('progress', true);
 					this._datatable._setPartialSelection = function(){};
 					this.set('selectedIds', []);
 					this.set('_sortProperty', this.idProperty);
@@ -465,8 +466,6 @@
 							property: this._sortProperty,
 							direction: this._sortDirection
 						}, this.page, this.pageSize];
-
-						this._datatable.set('progress', true);
 
 						if('queryForIds' in this.dataSource){
 							this.dataSource.queryForIds.apply(this.dataSource, queryArgs).then(function(ids){
